@@ -76,26 +76,6 @@ class BitMEX(object):
         # Prepare HTTPS session
         self.session = requests.Session()
 
-    def get_json_secret_data(self, path, postdict=None, verb=None):
-        url = self.base_uri + path
-        if not verb:
-            verb = 'POST' if postdict else 'GET'
-        nonce = int(time.time())
-        data=''
-        try:
-            message = bytes(verb + path + str(nonce) + data, "utf-8")
-            signing = hmac.new(self.apiSecret.encode("UTF-8"), message, digestmod=hashlib.sha512).hexdigest()
-            headers = {'api-signature': signing, 'api-key': self.apiKey, 'api-expires': str(nonce)}
-            path = self.base_uri + path
-            res = urllib.request.Request(path, headers=headers)
-            data = json.loads(urllib.request.urlopen(res).read())
-            return data
-        except urllib.error.HTTPError as e:
-            print('HTTPError: ', e)
-            sys.exit(1)
-        except json.JSONDecodeError as e:
-            print('JSONDecodeError: ', e)
-            sys.exit(1)
 
     def _curl_bitmex(self, path, query=None, postdict=None, timeout=3, verb=None):
         """Send a request to BitMEX Servers."""
