@@ -55,8 +55,8 @@ class board_trade():
     def current_price(self):
         current_bitmex = bitmex_basic.BitMEX(symbol=self.symbol, apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri=self.base_uri)
         current_market_boards = current_bitmex.market_depth()
-        bid = self.current_market_boards[0]['bidPrice']
-        ask = self.current_market_boards[0]['askPrice']
+        bid = current_market_boards[0]['bidPrice']
+        ask = current_market_boards[0]['askPrice']
         return {'bid': bid,'ask': ask}
 
 
@@ -116,15 +116,16 @@ class board_trade():
                 order_ID = self.bitmex.sell(volume, price)['orderID']
 
             while(self.bitmex.position() == [] and count < 10):
-                if(buy_or_sell=='buy' and self.current_price['bid'] - price >= 0.5):
+                if(buy_or_sell=='buy' and self.current_price()['bid'] - price >= 0.5):
                     break
-                elif(buy_or_sell=='sell' and  price - self.current_price['ask'] >= 0.5):
+                elif(buy_or_sell=='sell' and  price - self.current_price()['ask'] >= 0.5):
                     break
                 sleep(1)
                 count += 1
             print('order_ID: ' + order_ID)
 
             self.bitmex.cancel(order_ID)
+            print(self.bitmex.position())
             position = self.bitmex.position()[0]['currentQty']
             if(position > 0):
                 #利確設定
@@ -150,7 +151,7 @@ class board_trade():
 while(True):
     board_trade1 = board_trade(symbol='XBTUSD', base_uri='https://testnet.bitmex.com/api/v1/')
     board_trade2 = board_trade(symbol='XBTUSD', base_uri='https://testnet.bitmex.com/api/v1/')
-    board_trade1.trade(mini_size=1000,decide_big=3,decide_samll=2)
+    board_trade1.trade(mini_size=10000,decide_big=2,decide_samll=1)
     bitmex = bitmex_basic.BitMEX(symbol='XBTUSD', apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri='https://testnet.bitmex.com/api/v1/')
     bitmex.closeAllPosition()
     sleep(2)
