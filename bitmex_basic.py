@@ -153,13 +153,15 @@ class BitMEX(object):
         Returns order object. ID: orderID
         price指定なしで成り行き
         """
+        print("buy: quantity:" + str(quantity) + "price: " str(price))
         return self.place_order(quantity, price=None)
 
-    def sell(self, quantity, price):
+    def sell(self, quantity, price=None):
         """Place a sell order.
         Returns order object. ID: orderID
         price指定なしで成り行き
         """
+        print("sell: quantity:" + str(quantity) + "price: " str(price))
         return self.place_order(-quantity, price)
 
 
@@ -216,9 +218,10 @@ class BitMEX(object):
 
 
 #bit_mex = BitMEX(symbol='XBTUSD', apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri='https://testnet.bitmex.com/api/v1/')
-#print(bit_mex.sell(1000,8119))
+#bit_mex = BitMEX(symbol='XBTUSD', apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri='https://testnet.bitmex.com/api/v1/')
+#print(bit_mex.position())
 #print(bit_mex.cancel('2b7238b8-8d91-5020-6b29-bba86a5bed76'))
-#print(bit_mex.buy(1000,8135))
-#print(bit_mex.wallet())
+#print(bit_mex.buy(500,9935))
+#print(bit_mex.position())
 #print(bit_mex.funds())
 
