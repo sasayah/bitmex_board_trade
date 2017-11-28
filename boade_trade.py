@@ -125,25 +125,25 @@ class board_trade():
             print('order_ID: ' + order_ID)
 
             self.bitmex.cancel(order_ID)
-            print(self.bitmex.position())
-            position = self.bitmex.position()[0]['currentQty']
-            if(position > 0):
-                #利確設定
-                #positionの取り方を変更
-                if(buy_or_sell=='buy'):
-                    self.bitmex.sell(position,settle_price)
-                elif(buy_or_sell=='sell'):
-                    self.bitmex.buy(position,settle_price)
+            if(self.bitmex.position() != []):
+                position = self.bitmex.position()[0]['currentQty']
+                if(position > 0):
+                    #利確設定
+                    #positionの取り方を変更
+                    if(buy_or_sell=='buy'):
+                        self.bitmex.sell(position,settle_price)
+                    elif(buy_or_sell=='sell'):
+                        self.bitmex.buy(position,settle_price)
 
-                #損切り設定
-                while(self.bitmex.position() != []):
-                    if(buy_or_sell=='buy' and self.current_price()['ask']<=lost_cut_price):
-                        break
-                    elif(buy_or_sell=='sell' and self.current_price()['bid']>=lost_cut_price):
-                        break
-                    sleep(1)
-                
-                self.bitmex.closeAllPosition()
+                    #損切り設定
+                    while(self.bitmex.position() != []):
+                        if(buy_or_sell=='buy' and self.current_price()['ask']<=lost_cut_price):
+                            break
+                        elif(buy_or_sell=='sell' and self.current_price()['bid']>=lost_cut_price):
+                            break
+                        sleep(1)
+                    
+                    self.bitmex.closeAllPosition()
 
 
             
