@@ -153,7 +153,7 @@ class BitMEX(object):
         Returns order object. ID: orderID
         price指定なしで成り行き
         """
-        print("buy: quantity:" + str(quantity) + "price: " str(price))
+        print("buy: quantity:" + str(quantity) + "price: " + str(price))
         return self.place_order(quantity, price=None)
 
     def sell(self, quantity, price=None):
@@ -161,7 +161,7 @@ class BitMEX(object):
         Returns order object. ID: orderID
         price指定なしで成り行き
         """
-        print("sell: quantity:" + str(quantity) + "price: " str(price))
+        print("sell: quantity:" + str(quantity) + "price: " + str(price))
         return self.place_order(-quantity, price)
 
 

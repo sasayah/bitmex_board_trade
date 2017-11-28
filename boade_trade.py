@@ -147,7 +147,7 @@ class board_trade():
 
             
 
-#while(True):
+while(True):
     board_trade1 = board_trade(symbol='XBTUSD', base_uri='https://testnet.bitmex.com/api/v1/')
     board_trade2 = board_trade(symbol='XBTUSD', base_uri='https://testnet.bitmex.com/api/v1/')
     board_trade1.trade(mini_size=1000,decide_big=3,decide_samll=2)
