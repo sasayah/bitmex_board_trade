@@ -153,7 +153,7 @@ class BitMEX(object):
         Returns order object. ID: orderID
         price指定なしで成り行き
         """
-        print("buy: quantity:" + str(quantity) + "price: " + str(price))
+        print("buy: quantity:" + str(quantity) + " price: " + str(price))
         return self.place_order(quantity, price=None)
 
     def sell(self, quantity, price=None):
@@ -161,7 +161,7 @@ class BitMEX(object):
         Returns order object. ID: orderID
         price指定なしで成り行き
         """
-        print("sell: quantity:" + str(quantity) + "price: " + str(price))
+        print("sell: quantity:" + str(quantity) + " price: " + str(price))
         return self.place_order(-quantity, price)
 
 
@@ -183,6 +183,7 @@ class BitMEX(object):
 
     def cancel(self, orderID):
         """Cancel an existing order."""
+        print("Cancel an existing order")
         path = "order"
         postdict = {
             'orderID': orderID,
@@ -191,6 +192,7 @@ class BitMEX(object):
 
     def closeAllPosition(self, price=None):
         """priceを指定しないと、成り行きで全決済"""
+        print("close All position")
         path = "order/closePosition"
         postdict = {
             'symbol': self.symbol,
