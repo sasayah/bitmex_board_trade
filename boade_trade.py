@@ -9,7 +9,9 @@ from time import sleep
 class board_trade():
 
     def __init__(self,base_uri, symbol):
-        self.bitmex = bitmex_basic.BitMEX(symbol=symbol, apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri=base_uri)
+        self.symbol = symbol
+        self.base_uri = base_uri
+        self.bitmex = bitmex_basic.BitMEX(symbol=self.symbol, apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri=self.base_uri)
         self.market_boards = self.bitmex.market_depth()
 
 
@@ -45,14 +47,16 @@ class board_trade():
     def decide_price(self,buy_or_sell):
         price = 0.0
         if(buy_or_sell=='buy'):
-            price = self.market_boards[0]['askPrice']
-        elif(buy_or_sell=='sell'):
             price = self.market_boards[0]['bidPrice']
+        elif(buy_or_sell=='sell'):
+            price = self.market_boards[0]['askPrice']
         return price
     
     def current_price(self):
-        bid = self.market_boards[0]['bidPrice']
-        ask = self.market_boards[0]['askPrice']
+        current_bitmex = bitmex_basic.BitMEX(symbol=self.symbol, apiKey=os.environ["API_TEST_KEY"], apiSecret=os.environ["API_TEST_SECRET"], base_uri=self.base_uri)
+        current_market_boards = current_bitmex.market_depth()
+        bid = self.current_market_boards[0]['bidPrice']
+        ask = self.current_market_boards[0]['askPrice']
         return {'bid': bid,'ask': ask}
 
 
@@ -103,22 +107,18 @@ class board_trade():
             price = self.decide_price(buy_or_sell)
             volume = self.decide_volume(buy_or_sell)
             order_ID = ''
-            change_price = 0.0
             count = 0
-            count2 = 0
             settle_price = self.settle_price_func(buy_or_sell, series_num, price)
             lost_cut_price = self.lost_cut_price_func(buy_or_sell, price)
             if(buy_or_sell=='buy'):
                 order_ID = self.bitmex.buy(volume, price)['orderID']
-                change_price -= 0.5
             elif(buy_or_sell=='sell'):
                 order_ID = self.bitmex.sell(volume, price)['orderID']
-                change_price += 0.5
 
             while(self.bitmex.position() == [] and count < 10):
-                if(buy_or_sell=='buy' and self.decide_price(buy_or_sell) - price <= change_price):
+                if(buy_or_sell=='buy' and self.current_price['bid'] - price >= 0.5):
                     break
-                elif(buy_or_sell=='sell' and self.decide_price(buy_or_sell) - price >= change_price):
+                elif(buy_or_sell=='sell' and  price - self.current_price['ask'] >= 0.5):
                     break
                 sleep(1)
                 count += 1
@@ -128,19 +128,19 @@ class board_trade():
             position = self.bitmex.position()[0]['currentQty']
             if(position > 0):
                 #利確設定
+                #positionの取り方を変更
                 if(buy_or_sell=='buy'):
                     self.bitmex.sell(position,settle_price)
                 elif(buy_or_sell=='sell'):
                     self.bitmex.buy(position,settle_price)
 
                 #損切り設定
-                while(self.bitmex.position() != [] and count2 < 10):
-                    if(buy_or_sell=='buy' and self.current_price()['bid']<price):
+                while(self.bitmex.position() != []):
+                    if(buy_or_sell=='buy' and self.current_price()['ask']<=lost_cut_price):
                         break
-                    elif(buy_or_sell=='sell' and self.current_price()['ask']>price):
+                    elif(buy_or_sell=='sell' and self.current_price()['bid']>=lost_cut_price):
                         break
                     sleep(1)
-                    count += 1
                 
                 self.bitmex.closeAllPosition()
 
